@@ -26,7 +26,7 @@ class AsyncCreator(Creator):
     ):
         offset = 0
         step = 50
-        url = f"{self.parser.base_url}/api/v1/{self.service}/user/{self.id}"
+        url = self.parser.fmt_get_posts_url.format(self=self)
         params = {"q": q} if q else {}
 
         while offset < offset_limit:  # Проверяем, что offset не превышает лимит
@@ -37,12 +37,10 @@ class AsyncCreator(Creator):
             ) as session:
                 async with session.get(url, params=params) as r:
                     if r.status != 200:
-                        # print("r.status != 200")
                         break
                     posts = await r.json()
 
                     if not posts:  # Если данные закончились, выходим из цикла
-                        # print("end posts")
                         break
 
             posts = [Post(data=post, parser=self.parser) for post in posts]

@@ -39,24 +39,28 @@ class Post:
 
     def get_all_file_urls(self) -> List[str]:
         urls = []
-        if len(self.attachments) != 0:
-            urls = [
-                f"{self.parser.base_url}{attachment['path']}"
-                for attachment in self.attachments
-                if "path" in attachment
-            ]
-            urls.extend(urls)
 
-        if len(self.file) != 0:
-            url = f"{self.parser.base_url}{self.file['path']}"
+        # Process attachments
+        if self.attachments:
+            urls_attachments = [
+                self.parser.fmt_file_url.format(self=self, path=attachment['path'])
+                for attachment in self.attachments if 'path' in attachment
+            ]
+            urls.extend(urls_attachments)
+
+        # Process single file
+        if self.file and 'path' in self.file:
+            url = self.parser.fmt_file_url.format(self=self, path=self.file['path'])
             urls.append(url)
 
+        # Convert to thumbnails if applicable
         if self.parser.images_as_thumbnails:
             for i, url in enumerate(urls):
-                path = url.split(self.parser.base_url)[-1]
-                ext = path.split(".")[-1]
+                path = url.split(self.parser.data_url)[-1]
+                ext = path.rsplit(".", 1)[-1]
                 if ext in IMAGE_EXTS:
-                    urls[i] = f"{self.parser.thumbnail_url}{path}"
+                    urls[i] = self.parser.fmt_thumbnail_url.format(self=self, path=path)
+                    
         urls = set(urls)
         return urls
 

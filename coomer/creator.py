@@ -24,12 +24,8 @@ class Creator:
             raise ValueError(
                 f"{name=} not found in 'creators, or {data=} cant be None '"
             )
-        self.icons_url = (
-            f"https://img.{self.parser.domain}/icons/{self.service}/{self.id}"
-        )
-        self.banners_url = (
-            f"https://img.{self.parser.domain}/banners/{self.service}/{self.id}"
-        )
+        self.icons_url = self.parser.fmt_icons_url.format(self=self)
+        self.banners_url = self.parser.fmt_banners_url.format(self=self)
 
     def __str__(self) -> str:
         attributes = ", ".join(f"{key}={value}" for key, value in vars(self).items())
@@ -52,18 +48,16 @@ class Creator:
     ):
         offset = 0
         step = 50
-        url = f"{self.parser.base_url}/api/v1/{self.service}/user/{self.id}"
+        url = self.parser.fmt_get_posts_url.format(self=self)
         params = {"q": q} if q else {}
 
         while offset < offset_limit:  # Проверяем, что offset не превышает лимит
             r = get(url, timeout=self.parser.timeout, params=params)
             if r.status_code != 200:
-                # print("r.status != 200")
                 break
             posts = r.json()
 
             if not posts:  # Если данные закончились, выходим из цикла
-                # print("end posts")
                 break
 
             posts = [Post(data=post, parser=self.parser) for post in posts]

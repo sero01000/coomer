@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="coomer",
-    version="0.1.1",
+    version="0.1.2",
     author="sero01000",
     author_email="author@example.com",
     description="Coomer/Kemono Api client",
@@ -27,7 +27,7 @@ setup(
         "asyncio",
     ],
     install_requires=[
-        "requests",
+        "requests>=2.0.0,<3.0.0",
         "pydantic>=2.4.1,<2.11",
     ],
     extras_require={
